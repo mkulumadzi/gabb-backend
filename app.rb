@@ -297,3 +297,11 @@ get '/image/*' do
   if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
   redirect Gabb::FileService.get_presigned_url uid
 end
+
+get '/podcasts/*' do
+  feedwrangler_url = "https://feedwrangler.net/api/v2"
+  client_key = "3475d9da221dca830b1cde44a4079bed"
+  request_path = request.env["REQUEST_PATH"]
+  redirect_url =  "#{feedwrangler_url}#{request_path}?client_key=#{client_key}"
+  redirect redirect_url
+end
