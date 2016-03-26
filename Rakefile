@@ -52,9 +52,4 @@ namespace :auth do
   	token.mark_as_valid
   end
 
-  task :download_certificates do
-    get_certificate_file_from_aws_if_neccessary 'private.pem', 'certificates'
-    get_certificate_file_from_aws_if_neccessary 'public.pem', 'certificates'
-  end
-
 end
