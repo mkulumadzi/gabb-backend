@@ -13,7 +13,7 @@ end
 
 def get_person_object_from_person_response person_response
 	person_id = person_response["_id"]["$oid"]
-	person = SkeletonApp::Person.find(person_id)
+	person = Gabb::Person.find(person_id)
 end
 
 def app
@@ -27,10 +27,10 @@ describe app do
 		@person2 = create(:person, username: SecureRandom.hex)
 		@person3 = create(:person, username: SecureRandom.hex)
 
-    @admin_token = SkeletonApp::AuthService.get_admin_token
-    @app_token = SkeletonApp::AuthService.get_app_token
-    @person1_token = SkeletonApp::AuthService.generate_token_for_person @person1
-    @person2_token = SkeletonApp::AuthService.generate_token_for_person @person2
+    @admin_token = Gabb::AuthService.get_admin_token
+    @app_token = Gabb::AuthService.get_app_token
+    @person1_token = Gabb::AuthService.generate_token_for_person @person1
+    @person2_token = Gabb::AuthService.generate_token_for_person @person2
 	end
 
 	describe 'app_root' do
@@ -44,9 +44,9 @@ describe app do
 
     end
 
-		describe 'SKELETON_APP_BASE_URL' do
-			it 'must have a value for SkeletonApp BASE URL' do
-				ENV['SKELETON_APP_BASE_URL'].must_be_instance_of String
+		describe 'GABB_BASE_URL' do
+			it 'must have a value for Gabb BASE URL' do
+				ENV['GABB_BASE_URL'].must_be_instance_of String
 			end
 		end
 
@@ -140,7 +140,7 @@ describe app do
   		end
 
   		it 'must include the person uri in the header' do
-  			assert_match(/#{ENV['SKELETON_APP_BASE_URL']}\/person\/id\/\w{24}/, last_response.header["location"])
+  			assert_match(/#{ENV['GABB_BASE_URL']}\/person\/id\/\w{24}/, last_response.header["location"])
   		end
 
     end
@@ -383,12 +383,12 @@ describe app do
 			end
 
 			it 'must update the person record' do
-				person = SkeletonApp::Person.find(@person1.id)
+				person = Gabb::Person.find(@person1.id)
 				person.city.must_equal "New York"
 			end
 
 			it 'must not void fields that are not included in the update' do
-				person = SkeletonApp::Person.find(@person1.id)
+				person = Gabb::Person.find(@person1.id)
 				person.given_name.must_equal @person1.given_name
 			end
 
@@ -454,7 +454,7 @@ describe app do
 				# Creating a person with a password to test login
 				person_attrs = attributes_for(:person)
 				data = Hash["username", SecureRandom.hex, "name", person_attrs[:name], "email", Faker::Internet.email, "phone", Faker::PhoneNumber.phone_number, "password", "password"]
-				@user = SkeletonApp::PersonService.create_person data
+				@user = Gabb::PersonService.create_person data
 
 				data = '{"username": "' + @user.username + '", "password": "password"}'
 				post "/login", data
@@ -509,7 +509,7 @@ describe app do
 		before do
 			person_attrs = attributes_for(:person)
 			data = Hash["username", SecureRandom.hex, "name", person_attrs[:name], "email", Faker::Internet.email, "phone", Faker::PhoneNumber.phone_number, "password", "password"]
-			@person = SkeletonApp::PersonService.create_person data
+			@person = Gabb::PersonService.create_person data
 		end
 
 		describe 'submit the correct old password and a valid new password' do
@@ -524,8 +524,8 @@ describe app do
 			end
 
 			it 'must reset the password' do
-				person_record = SkeletonApp::Person.find(@person.id)
-				person_record.hashed_password.must_equal SkeletonApp::LoginService.hash_password "password123", person_record.salt
+				person_record = Gabb::Person.find(@person.id)
+				person_record.hashed_password.must_equal Gabb::LoginService.hash_password "password123", person_record.salt
 			end
 
 			it 'must return an empty response body' do
@@ -577,7 +577,7 @@ describe app do
   describe '/validate_email' do
 
     before do
-      @token = SkeletonApp::AuthService.get_email_validation_token @person1
+      @token = Gabb::AuthService.get_email_validation_token @person1
       post "/validate_email", nil, {"HTTP_AUTHORIZATION" => "Bearer #{@token}"}
     end
 
@@ -590,21 +590,21 @@ describe app do
     end
 
     it 'must mark the email address as valid' do
-      person = SkeletonApp::Person.find(@person1.id)
+      person = Gabb::Person.find(@person1.id)
       person.email_address_validated.must_equal true
     end
 
     it 'must flag the token as invalid so that it cannot be used again' do
-      db_token = SkeletonApp::Token.find_by(value: @token)
+      db_token = Gabb::Token.find_by(value: @token)
       db_token.is_invalid.must_equal true
     end
 
     describe 'error conditions' do
 
       it 'must return a 401 status if the token has expired' do
-        payload = SkeletonApp::AuthService.generate_payload_for_email_validation @person1
+        payload = Gabb::AuthService.generate_payload_for_email_validation @person1
         payload[:exp] = Time.now.to_i - 60
-        token = SkeletonApp::AuthService.generate_token payload
+        token = Gabb::AuthService.generate_token payload
         post "/validate_email", nil, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
 
         last_response.status.must_equal 401
@@ -616,7 +616,7 @@ describe app do
       end
 
       it 'must return a 401 status if the same token is used twice' do
-        token = SkeletonApp::AuthService.get_email_validation_token @person1
+        token = Gabb::AuthService.get_email_validation_token @person1
         post "/validate_email", nil, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
         post "/validate_email", nil, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
         last_response.status.must_equal 401
@@ -629,7 +629,7 @@ describe app do
   describe '/reset_password' do
 
     before do
-      @token = SkeletonApp::AuthService.get_password_reset_token @person1
+      @token = Gabb::AuthService.get_password_reset_token @person1
       data = '{"password": "password123"}'
       post "/reset_password", data, {"HTTP_AUTHORIZATION" => "Bearer #{@token}"}
     end
@@ -643,21 +643,21 @@ describe app do
     end
 
     it 'must reset the password' do
-      new_person_record = SkeletonApp::Person.find(@person1.id)
-      new_person_record.hashed_password.must_equal SkeletonApp::LoginService.hash_password "password123", new_person_record.salt
+      new_person_record = Gabb::Person.find(@person1.id)
+      new_person_record.hashed_password.must_equal Gabb::LoginService.hash_password "password123", new_person_record.salt
     end
 
     it 'must flag the token as invalid so that it cannot be used again' do
-      db_token = SkeletonApp::Token.find_by(value: @token)
+      db_token = Gabb::Token.find_by(value: @token)
       db_token.is_invalid.must_equal true
     end
 
     describe 'error conditions' do
 
       it 'must return a 401 status if the token has expired' do
-        payload = SkeletonApp::AuthService.generate_payload_for_password_reset @person1
+        payload = Gabb::AuthService.generate_payload_for_password_reset @person1
         payload[:exp] = Time.now.to_i - 60
-        token = SkeletonApp::AuthService.generate_token payload
+        token = Gabb::AuthService.generate_token payload
         data = '{"password": "password123"}'
         post "/reset_password", data, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
 
@@ -671,7 +671,7 @@ describe app do
       end
 
       it 'must return a 401 status if the same token is used twice' do
-        token = SkeletonApp::AuthService.get_password_reset_token @person1
+        token = Gabb::AuthService.get_password_reset_token @person1
         data = '{"password": "password123"}'
         post "/reset_password", data, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
         post "/reset_password", data, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
@@ -679,7 +679,7 @@ describe app do
       end
 
       it 'must return a 403 status if the data does not include a "password" field' do
-        token = SkeletonApp::AuthService.get_password_reset_token @person2
+        token = Gabb::AuthService.get_password_reset_token @person2
         data = '{"wrong": "password123"}'
         post "/reset_password", data, {"HTTP_AUTHORIZATION" => "Bearer #{token}"}
         last_response.status.must_equal 403
@@ -694,8 +694,8 @@ describe app do
 		describe 'email enabled' do
 
 			before do
-				ENV['SKELETON_APP_EMAIL_ENABLED'] = 'yes'
-        ENV['SKELETON_APP_POSTMARK_EMAIL_ADDRESS'] = "test@test.com"
+				ENV['GABB_EMAIL_ENABLED'] = 'yes'
+        ENV['GABB_POSTMARK_EMAIL_ADDRESS'] = "test@test.com"
 			end
 
 			describe 'successful request' do
@@ -736,7 +736,7 @@ describe app do
 			describe 'email disabled' do
 
 				before do
-					ENV['SKELETON_APP_EMAIL_ENABLED'] = 'no'
+					ENV['GABB_EMAIL_ENABLED'] = 'no'
 					data = '{"email": "' + @person1.email + '"}'
 					post "/request_password_reset?test=true", data, {"HTTP_AUTHORIZATION" => "Bearer #{@app_token}"}
 				end
@@ -765,13 +765,13 @@ describe app do
 
   		it 'must return a collection with all of the people if no parameters are entered' do
   			collection = JSON.parse(last_response.body)
-  			num_people = SkeletonApp::Person.count
+  			num_people = Gabb::Person.count
   			collection.length.must_equal num_people
   		end
 
   		it 'must return a filtered collection if parameters are given' do
   			get "/people?name=Evan", nil, {"HTTP_AUTHORIZATION" => "Bearer #{@admin_token}"}
-  			expected_number = SkeletonApp::Person.where(name: "Evan").count
+  			expected_number = Gabb::Person.where(name: "Evan").count
   			actual_number = JSON.parse(last_response.body).count
   			actual_number.must_equal expected_number
   		end
@@ -789,7 +789,7 @@ describe app do
 
       before do
         @person4 = create(:person, username: SecureRandom.hex)
-        person_record = SkeletonApp::Person.find(@person3.id)
+        person_record = Gabb::Person.find(@person3.id)
         @timestamp = person_record.updated_at
         @timestamp_string = JSON.parse(person_record.as_document.to_json)["updated_at"]
         get "/people", nil, {"HTTP_IF_MODIFIED_SINCE" => @timestamp_string, "HTTP_AUTHORIZATION" => "Bearer #{@admin_token}"}
@@ -801,7 +801,7 @@ describe app do
 
       it 'must only return people records that were created or updated after the timestamp' do
         num_returned = JSON.parse(last_response.body).count
-        expected_number = SkeletonApp::Person.where({updated_at: { "$gt" => @timestamp } }).count
+        expected_number = Gabb::Person.where({updated_at: { "$gt" => @timestamp } }).count
         num_returned.must_equal expected_number
       end
 

@@ -1,4 +1,4 @@
-module SkeletonApp
+module Gabb
 
 	class FileService
 
@@ -27,12 +27,12 @@ module SkeletonApp
 
 		def self.get_bucket
 			s3 = Aws::S3::Resource.new
-			s3.bucket(ENV['SKELETON_APP_AWS_BUCKET'])
+			s3.bucket(ENV['GABB_AWS_BUCKET'])
 		end
 
 		def self.get_presigned_url key
 			presigner = Aws::S3::Presigner.new
-			presigner.presigned_url(:get_object, bucket: ENV['SKELETON_APP_AWS_BUCKET'], key: key, expires_in: 60)
+			presigner.presigned_url(:get_object, bucket: ENV['GABB_AWS_BUCKET'], key: key, expires_in: 60)
 		end
 
 		def self.encode_file filename

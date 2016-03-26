@@ -1,14 +1,14 @@
 require 'erb'
 
-module SkeletonApp
+module Gabb
 
   class EmailService
 
     def self.image_email_attachment filename
       Hash[
         "Name" => filename,
-        "Content" => SkeletonApp::FileService.encode_file(filename),
-        "ContentType" => SkeletonApp::FileService.image_content_type(filename),
+        "Content" => Gabb::FileService.encode_file(filename),
+        "ContentType" => Gabb::FileService.image_content_type(filename),
         "ContentID" => "cid:#{filename}"
       ]
     end

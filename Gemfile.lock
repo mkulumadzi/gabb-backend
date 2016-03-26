@@ -1,0 +1,145 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (4.2.6)
+      activesupport (= 4.2.6)
+      builder (~> 3.1)
+    activesupport (4.2.6)
+      i18n (~> 0.7)
+      json (~> 1.7, >= 1.7.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.3, >= 0.3.4)
+      tzinfo (~> 1.1)
+    addressable (2.4.0)
+    ansi (1.5.0)
+    aws-sdk (2.2.30)
+      aws-sdk-resources (= 2.2.30)
+    aws-sdk-core (2.2.30)
+      jmespath (~> 1.0)
+    aws-sdk-resources (2.2.30)
+      aws-sdk-core (= 2.2.30)
+    bson (4.0.4)
+    bson_ext (1.5.1)
+    builder (3.2.2)
+    coderay (1.1.1)
+    css_parser (1.4.1)
+      addressable
+    dragonfly (1.0.12)
+      addressable (~> 2.3)
+      multi_json (~> 1.0)
+      rack (>= 1.3.0)
+    dragonfly-s3_data_store (1.2)
+      dragonfly (~> 1.0)
+      fog-aws
+    excon (0.48.0)
+    factory_girl (4.5.0)
+      activesupport (>= 3.0.0)
+    faker (1.6.3)
+      i18n (~> 0.5)
+    fog-aws (0.9.2)
+      fog-core (~> 1.27)
+      fog-json (~> 1.0)
+      fog-xml (~> 0.1)
+      ipaddress (~> 0.8)
+    fog-core (1.36.0)
+      builder
+      excon (~> 0.45)
+      formatador (~> 0.2)
+    fog-json (1.0.2)
+      fog-core (~> 1.0)
+      multi_json (~> 1.10)
+    fog-xml (0.1.2)
+      fog-core
+      nokogiri (~> 1.5, >= 1.5.11)
+    formatador (0.2.5)
+    htmlentities (4.3.4)
+    i18n (0.7.0)
+    ipaddress (0.8.3)
+    jmespath (1.1.3)
+    json (1.8.3)
+    jwt (1.5.4)
+    m (1.4.2)
+      method_source (>= 0.6.7)
+      rake (>= 0.9.2.2)
+    metaclass (0.0.4)
+    method_source (0.8.2)
+    mime-types (3.0)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2016.0221)
+    mini_portile2 (2.0.0)
+    minitest (5.8.4)
+    minitest-reporters (1.1.8)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
+    mocha (1.1.0)
+      metaclass (~> 0.0.1)
+    mongo (2.2.4)
+      bson (~> 4.0)
+    mongoid (5.0.2)
+      activemodel (~> 4.0)
+      mongo (~> 2.1)
+      origin (~> 2.1)
+      tzinfo (>= 0.3.37)
+    multi_json (1.11.2)
+    nokogiri (1.6.7.2)
+      mini_portile2 (~> 2.0.0.rc2)
+    origin (2.2.0)
+    postmark (1.7.1)
+      json
+      rake
+    premailer (1.8.6)
+      css_parser (>= 1.3.6)
+      htmlentities (>= 4.0.0)
+    pry (0.10.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    rack (1.6.4)
+    rack-protection (1.5.3)
+      rack
+    rack-test (0.6.3)
+      rack (>= 1.0)
+    rake (11.1.1)
+    ruby-progressbar (1.7.5)
+    sinatra (1.4.7)
+      rack (~> 1.5)
+      rack-protection (~> 1.4)
+      tilt (>= 1.3, < 3)
+    slop (3.6.0)
+    thread_safe (0.3.5)
+    tilt (2.0.2)
+    turn (0.9.6)
+      ansi
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  aws-sdk (~> 2)
+  bson_ext
+  dragonfly
+  dragonfly-s3_data_store
+  factory_girl
+  faker
+  json
+  jwt
+  m
+  mime-types
+  minitest-reporters
+  mocha
+  mongoid (~> 5.0.0)
+  postmark
+  premailer
+  pry
+  rack
+  rack-test
+  rake
+  sinatra
+  turn
+
+BUNDLED WITH
+   1.11.2

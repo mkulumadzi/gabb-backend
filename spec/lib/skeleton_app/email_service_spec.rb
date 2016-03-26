@@ -1,12 +1,12 @@
 require_relative '../../spec_helper'
 
-describe SkeletonApp::EmailService do
+describe Gabb::EmailService do
 
   describe 'image email attachment' do
 
     before do
       @filename = 'spec/resources/image1.jpg'
-      @image_attachment = SkeletonApp::EmailService.image_email_attachment @filename
+      @image_attachment = Gabb::EmailService.image_email_attachment @filename
     end
 
     it 'must return a Hash' do
@@ -18,7 +18,7 @@ describe SkeletonApp::EmailService do
     end
 
     it 'must include the base64-encoded content for the file' do
-      @image_attachment["Content"].must_equal SkeletonApp::FileService.encode_file(@filename)
+      @image_attachment["Content"].must_equal Gabb::FileService.encode_file(@filename)
     end
 
     it 'must include the content type' do
@@ -36,7 +36,7 @@ describe SkeletonApp::EmailService do
     before do
       @person = create(:person, username: SecureRandom.hex, email: "test@test.com")
       @hash = Hash(person: @person)
-      @temp_filename = SkeletonApp::EmailService.temp_filename
+      @temp_filename = Gabb::EmailService.temp_filename
       @template = 'spec/resources/test_email_template.html'
     end
 
@@ -63,7 +63,7 @@ describe SkeletonApp::EmailService do
     describe 'create temp file and render template' do
 
       before do
-        SkeletonApp::EmailService.create_temp_file_and_render_template @temp_filename, @template, @hash
+        Gabb::EmailService.create_temp_file_and_render_template @temp_filename, @template, @hash
       end
 
       after do
@@ -73,7 +73,7 @@ describe SkeletonApp::EmailService do
       describe 'render template' do
 
         before do
-          @rendered_template = SkeletonApp::EmailService.render_template @template, @hash
+          @rendered_template = Gabb::EmailService.render_template @template, @hash
         end
 
         it 'must return an HTML string' do
@@ -94,7 +94,7 @@ describe SkeletonApp::EmailService do
         file = File.open(@temp_filename)
         contents = file.read
         file.close
-        contents.must_equal SkeletonApp::EmailService.render_template @template, @hash
+        contents.must_equal Gabb::EmailService.render_template @template, @hash
       end
 
     end
@@ -102,7 +102,7 @@ describe SkeletonApp::EmailService do
     describe 'generate message' do
 
       before do
-        @message_body = SkeletonApp::EmailService.generate_email_message_body @template, @hash
+        @message_body = Gabb::EmailService.generate_email_message_body @template, @hash
       end
 
       it 'must return a string' do
@@ -125,7 +125,7 @@ describe SkeletonApp::EmailService do
 
     before do
       @email_hash = Hash[from: "test@test.com", to: "test2@test.com", subject: "This is a test", html_body: "<strong>Hello</strong> Mr. Test!", track_opens: false]
-      @result = SkeletonApp::EmailService.send_email @email_hash
+      @result = Gabb::EmailService.send_email @email_hash
     end
 
     it 'must not get an error' do

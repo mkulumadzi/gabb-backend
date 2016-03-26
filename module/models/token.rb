@@ -1,4 +1,4 @@
-module SkeletonApp
+module Gabb
 	class Token
 		include Mongoid::Document
 		include Mongoid::Timestamps

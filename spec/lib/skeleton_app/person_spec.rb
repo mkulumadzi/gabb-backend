@@ -1,6 +1,6 @@
 require_relative '../../spec_helper'
 
-describe SkeletonApp::Person do
+describe Gabb::Person do
 
 	before do
 		@person = create(:person, username: SecureRandom.hex)
@@ -12,7 +12,7 @@ describe SkeletonApp::Person do
 		describe 'store the fields' do
 
 			it 'must create a new person record' do
-				@person.must_be_instance_of SkeletonApp::Person
+				@person.must_be_instance_of Gabb::Person
 			end
 
 			it 'must store the username' do
@@ -22,7 +22,7 @@ describe SkeletonApp::Person do
 			it 'must thrown an error if a record is submitted with a duplicate username' do
 				person = create(:person, username: SecureRandom.hex)
 				assert_raises(Mongo::Error::OperationFailure) {
-					SkeletonApp::Person.create!(
+					Gabb::Person.create!(
 						username: person.username,
 						given_name: "test",
 						family_name: "user",
@@ -130,7 +130,7 @@ describe SkeletonApp::Person do
 		end
 
 		it 'must have saved the changes' do
-			person = SkeletonApp::Person.find(@person.id)
+			person = Gabb::Person.find(@person.id)
 			person.email_address_validated.must_equal true
 		end
 
@@ -139,7 +139,7 @@ describe SkeletonApp::Person do
 	describe 'uri' do
 
 		it 'must return a valid uri for the person' do
-  		assert_match(/#{ENV['SKELETON_APP_BASE_URL']}\/person\/id\/\w{24}/, @person.uri)
+  		assert_match(/#{ENV['GABB_BASE_URL']}\/person\/id\/\w{24}/, @person.uri)
 		end
 
 	end

@@ -1,4 +1,4 @@
-module SkeletonApp
+module Gabb
 
   class AppService
     # Convenience Methods
@@ -29,7 +29,7 @@ module SkeletonApp
       if request.env["HTTP_AUTHORIZATION"] != nil
         begin
           token = self.get_token_from_authorization_header request
-          decoded_token = SkeletonApp::AuthService.decode_token token
+          decoded_token = Gabb::AuthService.decode_token token
           payload = decoded_token[0]
         rescue JWT::ExpiredSignature
           "Token expired"
@@ -46,7 +46,7 @@ module SkeletonApp
     def self.unauthorized? request, required_scope
       payload = self.get_payload_from_authorization_header request
       token = self.get_token_from_authorization_header request
-      if SkeletonApp::AuthService.token_is_invalid(token)
+      if Gabb::AuthService.token_is_invalid(token)
         true
       elsif payload["scope"] == nil
         true
@@ -62,7 +62,7 @@ module SkeletonApp
       id = payload["id"]
       token = self.get_token_from_authorization_header request
 
-      if SkeletonApp::AuthService.token_is_invalid(token)
+      if Gabb::AuthService.token_is_invalid(token)
         true
       elsif payload["scope"] == nil
         true
@@ -83,7 +83,7 @@ module SkeletonApp
 
     def self.get_api_version_from_content_type request
       content_type = request.env["CONTENT_TYPE"]
-      if content_type && content_type.include?("application/vnd.SkeletonApp")
+      if content_type && content_type.include?("application/vnd.Gabb")
         version = content_type.split('.').last.split('+')[0]
       else
         version = "v1"
@@ -104,7 +104,7 @@ module SkeletonApp
 
     # Configuring a global variable that checks whether sending email is enabled in the app
     def self.email_enabled?
-      ENV['SKELETON_APP_EMAIL_ENABLED'] == 'yes' ? true : false
+      ENV['GABB_EMAIL_ENABLED'] == 'yes' ? true : false
     end
 
     def self.email_api_key request
@@ -117,8 +117,8 @@ module SkeletonApp
 
     def self.send_authorization_email_if_enabled person, request
       if self.email_enabled?
-        api_key = SkeletonApp::AppService.email_api_key request
-        SkeletonApp::AuthService.send_email_validation_email_if_necessary person, api_key
+        api_key = Gabb::AppService.email_api_key request
+        Gabb::AuthService.send_email_validation_email_if_necessary person, api_key
       end
     end
 
@@ -126,15 +126,15 @@ module SkeletonApp
       if self.email_enabled? && old_email && person.email != old_email
         person.email_address_validated = false
         person.save
-        api_key = SkeletonApp::AppService.email_api_key request
-        SkeletonApp::AuthService.send_email_validation_email_if_necessary person, api_key
+        api_key = Gabb::AppService.email_api_key request
+        Gabb::AuthService.send_email_validation_email_if_necessary person, api_key
       end
     end
 
     def self.send_password_reset_email_if_enabled person, request
       if self.email_enabled?
-        api_key = SkeletonApp::AppService.email_api_key request
-        SkeletonApp::AuthService.send_password_reset_email person, api_key
+        api_key = Gabb::AppService.email_api_key request
+        Gabb::AuthService.send_password_reset_email person, api_key
       else
         # App expects a hash, so return an empty hash
         Hash.new

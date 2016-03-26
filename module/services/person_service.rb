@@ -1,4 +1,4 @@
-module SkeletonApp
+module Gabb
 
 	class PersonService
 
@@ -8,8 +8,8 @@ module SkeletonApp
 			hashed_password = nil
 
 			if data["password"]
-				salt = SkeletonApp::LoginService.salt
-				hashed_password = SkeletonApp::LoginService.hash_password data["password"], salt
+				salt = Gabb::LoginService.salt
+				hashed_password = Gabb::LoginService.hash_password data["password"], salt
 			end
 
 			if data["phone"]
@@ -25,7 +25,7 @@ module SkeletonApp
 				email_validated = false
 			end
 
-			SkeletonApp::Person.create!({
+			Gabb::Person.create!({
 		      username: data["username"],
 					given_name: data["given_name"],
 					family_name: data["family_name"],
@@ -49,9 +49,9 @@ module SkeletonApp
 				raise "Missing required field: username"
 			elsif data["email"] == nil || data["email"] == ""
 				raise "Missing required field: email"
-			elsif SkeletonApp::Person.where(email: data["email"]).exists?
+			elsif Gabb::Person.where(email: data["email"]).exists?
 				raise "An account with that email already exists!"
-			elsif SkeletonApp::Person.where(phone: data["phone"]).exists? && data["phone"] != "" && data["phone"] != nil
+			elsif Gabb::Person.where(phone: data["phone"]).exists? && data["phone"] != "" && data["phone"] != nil
 				raise "An account with that phone number already exists!"
 			elsif data["password"] == nil || data["password"] == ""
 				raise "Missing required field: password"
@@ -65,7 +65,7 @@ module SkeletonApp
 		def self.update_person person, data
 			data["username"] ? raise(ArgumentError) : nil
 
-			if data["email"] && data["email"] != person.email && SkeletonApp::Person.where(email: data["email"]).exists?
+			if data["email"] && data["email"] != person.email && Gabb::Person.where(email: data["email"]).exists?
 				raise "An account with that email already exists!"
 			end
 
@@ -74,7 +74,7 @@ module SkeletonApp
 
 		def self.get_people params = {}
 			people = []
-			SkeletonApp::Person.where(params).each do |person|
+			Gabb::Person.where(params).each do |person|
 				people << person.as_document
 			end
 			people
@@ -97,19 +97,19 @@ module SkeletonApp
 		def self.create_query_for_search_term term
 			search_terms = term.split('+')
 			if search_terms.length == 1
-				SkeletonApp::Person.or({given_name: /#{term}/}, {family_name: /#{term}/}, {username: /#{term}/})
+				Gabb::Person.or({given_name: /#{term}/}, {family_name: /#{term}/}, {username: /#{term}/})
 			else
 				first_term = search_terms[0]
 				second_term = search_terms[1]
-				SkeletonApp::Person.or({given_name: /#{first_term}/, family_name: /#{second_term}/},{given_name: /#{second_term}/, family_name: /#{first_term}/})
+				Gabb::Person.or({given_name: /#{first_term}/, family_name: /#{second_term}/},{given_name: /#{second_term}/, family_name: /#{first_term}/})
 			end
 		end
 
 		def self.find_people_from_list_of_emails email_array
 			people = []
 			email_array.each do |email|
-				if SkeletonApp::Person.where(email: email).count > 0
-					people << SkeletonApp::Person.where(email: email).first
+				if Gabb::Person.where(email: email).count > 0
+					people << Gabb::Person.where(email: email).first
 				end
 			end
 			people
@@ -123,7 +123,7 @@ module SkeletonApp
 				raise "#{params.keys[0]} cannot be checked"
 			else
 				begin
-					SkeletonApp::Person.find_by(params)
+					Gabb::Person.find_by(params)
 					return Hash[params.keys[0], "unavailable"]
 				rescue Mongoid::Errors::DocumentNotFound
 					return Hash[params.keys[0], "available"]

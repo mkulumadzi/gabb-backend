@@ -1,4 +1,4 @@
-module SkeletonApp
+module Gabb
 	class Person
 		include Mongoid::Document
 		include Mongoid::Timestamps
@@ -52,7 +52,7 @@ module SkeletonApp
 		end
 
 		def uri
-			"#{ENV['SKELETON_APP_BASE_URL']}/person/id/#{self.id}"
+			"#{ENV['GABB_BASE_URL']}/person/id/#{self.id}"
 		end
 
 		def as_json

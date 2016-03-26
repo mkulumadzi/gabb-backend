@@ -26,7 +26,7 @@ end
 ## To Do: Use Dragonfly for storing as well?
 Aws.config.update({
   region: 'us-west-2',
-  credentials: Aws::Credentials.new(ENV['SKELETON_APP_AWS_ACCESS_KEY_ID'], ENV['SKELETON_APP_AWS_SECRET_ACCESS_KEY'])
+  credentials: Aws::Credentials.new(ENV['GABB_AWS_ACCESS_KEY_ID'], ENV['GABB_AWS_SECRET_ACCESS_KEY'])
 })
 
 ## Configuring Dragonfly for accessing images
@@ -36,9 +36,9 @@ Dragonfly.app.configure do
 
   datastore :s3,
 		region: 'us-west-2',
-    bucket_name: ENV['SKELETON_APP_AWS_BUCKET'],
-    access_key_id: ENV['SKELETON_APP_AWS_ACCESS_KEY_ID'],
-    secret_access_key: ENV['SKELETON_APP_AWS_SECRET_ACCESS_KEY']
+    bucket_name: ENV['GABB_AWS_BUCKET'],
+    access_key_id: ENV['GABB_AWS_ACCESS_KEY_ID'],
+    secret_access_key: ENV['GABB_AWS_SECRET_ACCESS_KEY']
 end
 
 ## Increasing max keyspace limit to allow photo uploads in base64 format...

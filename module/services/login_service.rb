@@ -1,6 +1,6 @@
 require 'digest/bubblebabble'
 
-module SkeletonApp
+module Gabb
 
 	class LoginService
 
@@ -22,13 +22,13 @@ module SkeletonApp
 
 		def self.find_person_record_from_login username_or_email
 			begin
-				person = SkeletonApp::Person.find_by(username: username_or_email)
+				person = Gabb::Person.find_by(username: username_or_email)
 				return person
 			rescue Mongoid::Errors::DocumentNotFound
 			end
 
 			begin
-				person = SkeletonApp::Person.find_by(email: username_or_email)
+				person = Gabb::Person.find_by(email: username_or_email)
 				return person
 			rescue Mongoid::Errors::DocumentNotFound
 				return nil
@@ -49,7 +49,7 @@ module SkeletonApp
 			fb_user_authenticated = self.authenticate_fb_user data["fb_access_token"], data["email"]
 			if fb_user_authenticated
 				begin
-					return SkeletonApp::Person.find_by(email: data["email"])
+					return Gabb::Person.find_by(email: data["email"])
 				rescue Mongoid::Errors::DocumentNotFound
 				end
 			end
@@ -74,7 +74,7 @@ module SkeletonApp
 		end
 
 		def self.response_for_successful_login person
-			token = SkeletonApp::AuthService.generate_token_for_person person
+			token = Gabb::AuthService.generate_token_for_person person
 			exp_in = 3600 * 24 * 72
 			person_json = person.as_document.to_json( :except => ["salt", "hashed_password", "device_token"] )
 			response = '{"access_token": "' + token + '", "token_type": "bearer", "expires_in": "' + exp_in.to_s + '", "person": ' + person_json + '}'
@@ -82,15 +82,15 @@ module SkeletonApp
 		end
 
 		def self.reset_password person, password
-			salt = SkeletonApp::LoginService.salt
+			salt = Gabb::LoginService.salt
 			person.salt = salt
-			person.hashed_password = SkeletonApp::LoginService.hash_password password, salt
+			person.hashed_password = Gabb::LoginService.hash_password password, salt
 			person.save
 		end
 
 		def self.password_reset_by_user id, data
 
-			person = SkeletonApp::Person.find(id)
+			person = Gabb::Person.find(id)
 
 			if data["old_password"] == data["new_password"]
 				raise "New password cannot equal existing password"

@@ -1,4 +1,4 @@
-require_relative 'module/skeleton_app'
+require_relative 'module/gabb'
 
 get '/' do
   "Hello World!"
@@ -14,12 +14,12 @@ end
 # Scope: create-person
 post '/person/new' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "create-person") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "create-person") then return [401, nil] end
 
   begin
     data = JSON.parse request.body.read
-    person = SkeletonApp::PersonService.create_person data
-    SkeletonApp::AppService.send_authorization_email_if_enabled person, request
+    person = Gabb::PersonService.create_person data
+    Gabb::AppService.send_authorization_email_if_enabled person, request
     headers = { "location" => person.uri }
     [201, headers, nil]
   rescue JSON::ParserError
@@ -39,9 +39,9 @@ end
 # Scope: create-person
 get '/available' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "create-person") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "create-person") then return [401, nil] end
   begin
-    response_body = SkeletonApp::PersonService.check_field_availability(params).to_json
+    response_body = Gabb::PersonService.check_field_availability(params).to_json
     [200, response_body]
   rescue RuntimeError
     [404, nil]
@@ -54,9 +54,9 @@ post '/login' do
   content_type :json
   begin
     data = JSON.parse request.body.read
-    person = SkeletonApp::LoginService.check_login data
+    person = Gabb::LoginService.check_login data
     if person
-      response_body = SkeletonApp::LoginService.response_for_successful_login person
+      response_body = Gabb::LoginService.response_for_successful_login person
       [200, response_body]
     else
       [401, nil]
@@ -73,10 +73,10 @@ end
 # Scope: can-read
 get '/person/id/:id' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
 
   begin
-    person = SkeletonApp::Person.find(params[:id])
+    person = Gabb::Person.find(params[:id])
     if request.env["HTTP_IF_MODIFIED_SINCE"] == nil
       [200, person.as_json]
     else
@@ -97,12 +97,12 @@ end
 # Scope: admin or (can_write & is person)
 post '/person/id/:id' do
   content_type :json
-  if SkeletonApp::AppService.not_admin_or_owner?(request, "can-write", params[:id]) then return [401, nil] end
+  if Gabb::AppService.not_admin_or_owner?(request, "can-write", params[:id]) then return [401, nil] end
   begin
     data = JSON.parse request.body.read
-    person = SkeletonApp::Person.find(params[:id])
-    SkeletonApp::PersonService.update_person person, data
-    SkeletonApp::AppService.send_validation_email_for_email_change_if_enabled person, request, data["email"]
+    person = Gabb::Person.find(params[:id])
+    Gabb::PersonService.update_person person, data
+    Gabb::AppService.send_validation_email_for_email_change_if_enabled person, request, data["email"]
     [204, nil]
   rescue JSON::ParserError
     response_body = Hash["message", "Malformed JSON"].to_json
@@ -124,10 +124,10 @@ end
 # Scope: reset-password
 post '/person/id/:id/reset_password' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "reset-password") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "reset-password") then return [401, nil] end
   begin
     data = JSON.parse(request.body.read)
-    SkeletonApp::LoginService.password_reset_by_user params[:id], data
+    Gabb::LoginService.password_reset_by_user params[:id], data
     [204, nil]
   rescue JSON::ParserError
     response_body = Hash["message", "Malformed JSON"].to_json
@@ -147,17 +147,17 @@ post '/validate_email' do
   response.headers["Access-Control-Allow-Origin"] = "*"
 
   # Check the token
-  if SkeletonApp::AppService.unauthorized?(request, "validate-email") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "validate-email") then return [401, nil] end
 
-  token = SkeletonApp::AppService.get_token_from_authorization_header request
-  if SkeletonApp::AuthService.token_is_invalid(token) then return [401, nil] end
+  token = Gabb::AppService.get_token_from_authorization_header request
+  if Gabb::AuthService.token_is_invalid(token) then return [401, nil] end
 
-  payload =  SkeletonApp::AppService.get_payload_from_authorization_header request
-  person = SkeletonApp::Person.find(payload["id"])
+  payload =  Gabb::AppService.get_payload_from_authorization_header request
+  person = Gabb::Person.find(payload["id"])
 
   person.mark_email_as_valid
 
-  db_token = SkeletonApp::Token.new(value: token)
+  db_token = Gabb::Token.new(value: token)
   db_token.mark_as_invalid
 
   [204, nil]
@@ -171,18 +171,18 @@ post '/reset_password' do
   response.headers["Access-Control-Allow-Origin"] = "*"
 
   # Check the token
-  if SkeletonApp::AppService.unauthorized?(request, "reset-password") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "reset-password") then return [401, nil] end
 
-  token = SkeletonApp::AppService.get_token_from_authorization_header request
-  if SkeletonApp::AuthService.token_is_invalid(token) then return [401, nil] end
+  token = Gabb::AppService.get_token_from_authorization_header request
+  if Gabb::AuthService.token_is_invalid(token) then return [401, nil] end
 
   if data["password"] == nil then return [403, nil] end
 
-  payload = SkeletonApp::AppService.get_payload_from_authorization_header request
-  person = SkeletonApp::Person.find(payload["id"])
-  SkeletonApp::LoginService.reset_password person, data["password"]
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  person = Gabb::Person.find(payload["id"])
+  Gabb::LoginService.reset_password person, data["password"]
 
-  db_token = SkeletonApp::Token.new(value: token)
+  db_token = Gabb::Token.new(value: token)
   db_token.mark_as_invalid
 
   [204, nil]
@@ -193,12 +193,12 @@ end
 post '/request_password_reset' do
   content_type :json
   # Check the token
-  if SkeletonApp::AppService.unauthorized?(request, "reset-password") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "reset-password") then return [401, nil] end
 
   begin
     data = JSON.parse(request.body.read)
-    person = SkeletonApp::Person.find_by(email: data["email"])
-    email_sent = SkeletonApp::AppService.send_password_reset_email_if_enabled person, request
+    person = Gabb::Person.find_by(email: data["email"])
+    email_sent = Gabb::AppService.send_password_reset_email_if_enabled person, request
     if email_sent[:error_code] == 0
       [201, nil]
     else
@@ -222,10 +222,10 @@ end
 # Scope: admin
 get '/people' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "admin") then return [401, nil] end
-  SkeletonApp::AppService.add_if_modified_since_to_request_parameters self
-  people_docs = SkeletonApp::PersonService.get_people(params)
-  response_body = SkeletonApp::AppService.json_document_for_people_documents people_docs
+  if Gabb::AppService.unauthorized?(request, "admin") then return [401, nil] end
+  Gabb::AppService.add_if_modified_since_to_request_parameters self
+  people_docs = Gabb::PersonService.get_people(params)
+  response_body = Gabb::AppService.json_document_for_people_documents people_docs
   [200, response_body]
 
 end
@@ -234,15 +234,15 @@ end
 # Scope: can-read
 get '/people/search' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
 
   begin
-    people_returned = SkeletonApp::PersonService.search_people params
+    people_returned = Gabb::PersonService.search_people params
     people_docs = []
     people_returned.each do |person|
       people_docs << person.as_document
     end
-    response_body = SkeletonApp::AppService.json_document_for_people_documents people_docs
+    response_body = Gabb::AppService.json_document_for_people_documents people_docs
     [200, response_body]
   rescue Mongoid::Errors::DocumentNotFound
     [404, response_body]
@@ -252,12 +252,12 @@ end
 
 post '/people/find_matches' do
   content_type :json
-  if SkeletonApp::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
   begin
     data = JSON.parse request.body.read
-    people = SkeletonApp::PersonService.find_people_from_list_of_emails data["emails"]
-    documents = SkeletonApp::AppService.convert_objects_to_documents people
-    response_body = SkeletonApp::AppService.json_document_for_people_documents documents
+    people = Gabb::PersonService.find_people_from_list_of_emails data["emails"]
+    documents = Gabb::AppService.convert_objects_to_documents people
+    response_body = Gabb::AppService.json_document_for_people_documents documents
     [201, response_body]
   rescue JSON::ParserError
     response_body = Hash["message", "Malformed JSON"].to_json
@@ -270,11 +270,11 @@ end
 # Upload a File
 # Scope: can-write
 post '/upload' do
-  if SkeletonApp::AppService.unauthorized?(request, "can-write") then return [401, nil] end
+  if Gabb::AppService.unauthorized?(request, "can-write") then return [401, nil] end
 
   begin
     data = JSON.parse request.body.read.gsub("\n", "")
-    uid = SkeletonApp::FileService.upload_file data
+    uid = Gabb::FileService.upload_file data
     headers = { "location" => uid }
     [201, headers, nil]
   rescue JSON::ParserError
@@ -294,6 +294,6 @@ end
 # Scope: can-read
 get '/image/*' do
   uid = params['splat'][0]
-  if SkeletonApp::AppService.unauthorized?(request, "can-read") then return [401, nil] end
-  redirect SkeletonApp::FileService.get_presigned_url uid
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  redirect Gabb::FileService.get_presigned_url uid
 end

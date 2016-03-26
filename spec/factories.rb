@@ -1,6 +1,6 @@
 FactoryGirl.define do
 
-  factory :person, class: SkeletonApp::Person do
+  factory :person, class: Gabb::Person do
     username "testuser"
     given_name "Test"
     family_name "User"

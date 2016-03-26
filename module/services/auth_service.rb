@@ -1,16 +1,16 @@
-module SkeletonApp
+module Gabb
 
 	class AuthService
 
 		def self.get_private_key
 			client = Aws::S3::Client.new
-			private_key_file = client.get_object(bucket:ENV['SKELETON_APP_CERTIFICATE_BUCKET'], key:'private.pem')
-			OpenSSL::PKey::RSA.new private_key_file.body.read, ENV['SKELETON_APP_PRIVATE_KEY_PASSPHRASE']
+			private_key_file = client.get_object(bucket:ENV['GABB_CERTIFICATE_BUCKET'], key:'private.pem')
+			OpenSSL::PKey::RSA.new private_key_file.body.read, ENV['GABB_PRIVATE_KEY_PASSPHRASE']
 		end
 
 		def self.get_public_key
 			client = Aws::S3::Client.new
-			public_key_file = client.get_object(bucket:ENV['SKELETON_APP_CERTIFICATE_BUCKET'], key:'public.pem')
+			public_key_file = client.get_object(bucket:ENV['GABB_CERTIFICATE_BUCKET'], key:'public.pem')
 			OpenSSL::PKey::RSA.new public_key_file.body.read
 		end
 
@@ -47,7 +47,7 @@ module SkeletonApp
 		def self.send_password_reset_email person, api_key = "POSTMARK_API_TEST"
 			token = self.get_password_reset_token person
 			email_hash = self.get_password_reset_email_hash person, token
-			SkeletonApp::EmailService.send_email email_hash, api_key
+			Gabb::EmailService.send_email email_hash, api_key
 		end
 
 		def self.get_password_reset_token person
@@ -65,10 +65,10 @@ module SkeletonApp
 			variables = Hash(person: person, token: token)
 
 			Hash[
-				from: ENV["SKELETON_APP_POSTMARK_EMAIL_ADDRESS"],
+				from: ENV["GABB_POSTMARK_EMAIL_ADDRESS"],
 				to: person.email,
 				subject: "We received a request to reset your password",
-				html_body: SkeletonApp::EmailService.generate_email_message_body(template, variables),
+				html_body: Gabb::EmailService.generate_email_message_body(template, variables),
 				track_opens: true
 			]
 		end
@@ -79,7 +79,7 @@ module SkeletonApp
 			else
 				token = self.get_email_validation_token person
 				email_hash = self.get_email_validation_hash person, token
-				SkeletonApp::EmailService.send_email email_hash, api_key
+				Gabb::EmailService.send_email email_hash, api_key
 			end
 		end
 
@@ -98,10 +98,10 @@ module SkeletonApp
 			variables = Hash(person: person, token: token)
 
 			Hash[
-				from: ENV["SKELETON_APP_POSTMARK_EMAIL_ADDRESS"],
+				from: ENV["GABB_POSTMARK_EMAIL_ADDRESS"],
 				to: person.email,
 				subject: "Please validate your email address",
-				html_body: SkeletonApp::EmailService.generate_email_message_body(template, variables),
+				html_body: Gabb::EmailService.generate_email_message_body(template, variables),
 				track_opens: true
 			]
 		end
@@ -135,14 +135,14 @@ module SkeletonApp
 		end
 
     def self.decode_token token
-      public_key = SkeletonApp::AuthService.get_public_key
+      public_key = Gabb::AuthService.get_public_key
       decoded_token = JWT.decode token, public_key
       decoded_token
     end
 
 		def self.token_is_invalid token
 			begin
-				db_token = SkeletonApp::Token.find_by(value: token)
+				db_token = Gabb::Token.find_by(value: token)
 				if db_token.is_invalid
 					true
 				else

@@ -1,6 +1,6 @@
 require_relative '../../spec_helper'
 
-describe SkeletonApp::FileService do
+describe Gabb::FileService do
 
   describe 'decode a base64 string and return a file' do
 
@@ -8,7 +8,7 @@ describe SkeletonApp::FileService do
       @string = "This is a string to encode."
       base64_string = Base64.encode64(@string)
       @key = "samplekey"
-      @file = File.open(SkeletonApp::FileService.decode_string_to_file base64_string, @key)
+      @file = File.open(Gabb::FileService.decode_string_to_file base64_string, @key)
       @file_contents = @file.read
     end
 
@@ -34,7 +34,7 @@ describe SkeletonApp::FileService do
       base64_string = Base64.encode64(@contents)
       @filename = "sample.txt"
       data = JSON.parse(('{"file": "'+ base64_string + '", "filename": "' + @filename + '"}').gsub("\n", ""))
-      @uid = SkeletonApp::FileService.upload_file data
+      @uid = Gabb::FileService.upload_file data
     end
 
     it 'must return a String as the UID' do
@@ -71,7 +71,7 @@ describe SkeletonApp::FileService do
 
       before do
         params = ""
-        @image_fetched = SkeletonApp::FileService.fetch_image @uid, params
+        @image_fetched = Gabb::FileService.fetch_image @uid, params
       end
 
       it 'must fetch the image' do
@@ -88,14 +88,14 @@ describe SkeletonApp::FileService do
 
       it 'must resize the image if a thumbnail is given' do
         params = Hash["thumb", "400x"]
-        image_fetched = SkeletonApp::FileService.fetch_image @uid, params
+        image_fetched = Gabb::FileService.fetch_image @uid, params
         image_fetched.width.must_equal 400
       end
 
       it 'must return a Argument Error if the thumbnail parameter is invalid' do
         params = Hash["thumb", "splat"]
         assert_raises ArgumentError do
-          image_fetched = SkeletonApp::FileService.fetch_image @uid, params
+          image_fetched = Gabb::FileService.fetch_image @uid, params
           image_fetched.apply
         end
       end
@@ -107,12 +107,12 @@ describe SkeletonApp::FileService do
   describe 'get AWS S3 bucket' do
 
     it 'must return an S3 bucket instance' do
-      SkeletonApp::FileService.get_bucket.must_be_instance_of Aws::S3::Bucket
+      Gabb::FileService.get_bucket.must_be_instance_of Aws::S3::Bucket
     end
 
     it 'must point to the bucket specified in the environment variable' do
-      bucket = SkeletonApp::FileService.get_bucket
-      bucket.name.must_equal ENV['SKELETON_APP_AWS_BUCKET']
+      bucket = Gabb::FileService.get_bucket
+      bucket.name.must_equal ENV['GABB_AWS_BUCKET']
     end
 
   end
@@ -122,7 +122,7 @@ describe SkeletonApp::FileService do
 
     before do
       @key = 'test/image1.jpg'
-      @url = SkeletonApp::FileService.get_presigned_url @key
+      @url = Gabb::FileService.get_presigned_url @key
     end
 
     it 'must return a presigned url as a String' do
@@ -142,7 +142,7 @@ describe SkeletonApp::FileService do
   describe 'base 64 encode a file' do
 
     before do
-      @base64String = SkeletonApp::FileService.encode_file 'spec/resources/image1.jpg'
+      @base64String = Gabb::FileService.encode_file 'spec/resources/image1.jpg'
     end
 
     it 'must return a string' do
@@ -162,7 +162,7 @@ describe SkeletonApp::FileService do
 
     it 'must return a string with image/ and the file extension' do
       filename = 'tmp/filename.png'
-      SkeletonApp::FileService.image_content_type(filename).must_equal "image/png"
+      Gabb::FileService.image_content_type(filename).must_equal "image/png"
     end
 
   end

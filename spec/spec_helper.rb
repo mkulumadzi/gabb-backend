@@ -1,5 +1,5 @@
 # Load the main files
-require_relative '../module/skeleton_app'
+require_relative '../module/gabb'
 require_relative '../app'
 
 # Load Factories
