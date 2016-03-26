@@ -1,4 +1,4 @@
-# GabbBackend
+# Gabb Backend
 
 ## Configuration
 
