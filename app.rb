@@ -12,9 +12,10 @@ end
 
 # Create a new person
 # Scope: create-person
+## Commenting out the scope for now
 post '/person/new' do
   content_type :json
-  if Gabb::AppService.unauthorized?(request, "create-person") then return [401, nil] end
+  # if Gabb::AppService.unauthorized?(request, "create-person") then return [401, nil] end
 
   begin
     data = JSON.parse request.body.read
@@ -39,7 +40,7 @@ end
 # Scope: create-person
 get '/available' do
   content_type :json
-  if Gabb::AppService.unauthorized?(request, "create-person") then return [401, nil] end
+  # if Gabb::AppService.unauthorized?(request, "create-person") then return [401, nil] end
   begin
     response_body = Gabb::PersonService.check_field_availability(params).to_json
     [200, response_body]
