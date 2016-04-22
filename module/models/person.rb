@@ -3,6 +3,8 @@ module Gabb
 		include Mongoid::Document
 		include Mongoid::Timestamps
 
+		has_many :sessions
+
 		field :username, type: String
 		field :given_name, type: String
 		field :family_name, type: String
