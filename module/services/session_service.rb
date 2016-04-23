@@ -35,18 +35,21 @@ module Gabb
 
     def self.sessions payload, params
       person = Gabb::Person.find(payload["id"])
-      limit = params["limit"] ? params["limit"] : 25
 
       # Hacky way to get distinct most recent sessions, since I can't figure out how to get the Mongoid aggregate function to work.
       episode_hashes = person.sessions.distinct("episode_hash")
-      limit = (episode_hashes.count < limit) ? episode_hashes.count : limit
       sessions = []
-      for i in 0...limit
+      for i in 0...episode_hashes.count
         episode_hash = episode_hashes[i]
         sessions << person.sessions.where(episode_hash: episode_hash).order_by(updated_at: 'desc').first
       end
 
-      sessions.sort {|a, b| b.created_at <=> a.created_at }
+      sessions = sessions.sort {|a, b| b.updated_at <=> a.updated_at }
+
+      limit = params["limit"] ? params["limit"].to_i : 25
+      limit = (episode_hashes.count < limit) ? episode_hashes.count : limit
+
+      sessions.first(limit)
     end
 
   end
