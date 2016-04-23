@@ -43,10 +43,10 @@ module Gabb
       sessions = []
       for i in 0...limit
         episode_hash = episode_hashes[i]
-        sessions << person.sessions.where(episode_hash: episode_hash).order_by(created_at: 'desc').first
+        sessions << person.sessions.where(episode_hash: episode_hash).order_by(updated_at: 'desc').first
       end
 
-      sessions
+      sessions.sort {|a, b| a.created_at <=> b.created_at }
     end
 
   end
