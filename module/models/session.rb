@@ -6,6 +6,8 @@ module Gabb
 
     belongs_to :person
 
+    field :podcast_id, type: Integer
+    field :title, type: String
     field :episode_url, type: String
     field :episode_hash, type: String
     field :start_time_scale, type: Integer
