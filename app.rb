@@ -346,7 +346,7 @@ post '/session/stop' do
     [400, nil, response_body]
   rescue Mongoid::Errors::DocumentNotFound
     ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
-    [401, response_body]
+    [401, nil]
   end
 end
 
@@ -359,6 +359,24 @@ get '/session/last' do
     session ? [200, session.as_json] : [404, nil]
   rescue Mongoid::Errors::DocumentNotFound
     ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
-    [401, response_body]
+    [401, nil]
+  end
+end
+
+get '/sessions' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    sessions = Gabb::SessionService.sessions payload, params
+    if sessions && sessions.count > 0
+      response_body = Gabb::AppService.convert_objects_to_documents(sessions).to_json
+      [200, response_body]
+    else
+      [404, nil]
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
+    [401, nil]
   end
 end

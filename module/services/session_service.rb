@@ -33,6 +33,12 @@ module Gabb
       session
     end
 
+    def self.sessions payload, params
+      person = Gabb::Person.find(payload["id"])
+      limit = params["limit"] ? params["limit"] : 25
+      person.sessions.order_by(created_at: 'desc').limit(limit).to_a
+    end
+
   end
 
 end
