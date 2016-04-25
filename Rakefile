@@ -19,18 +19,21 @@ namespace :db do
   	Gabb::Person.create_indexes
     Gabb::Token.create_indexes
     Gabb::Session.create_indexes
+    Gabb::Chat.create_indexes
   end
 
   task :remove_indexes do
     Gabb::Person.remove_indexes
     Gabb::Token.remove_indexes
     Gabb::Session.remove_indexes
+    Gabb::Chat.create_indexes
   end
 
   task :reset do
     Gabb::Person.delete_all
     Gabb::Token.delete_all
     Gabb::Session.delete_all
+    Gabb::Chat.delete_all
   end
 
 end

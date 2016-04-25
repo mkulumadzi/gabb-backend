@@ -4,6 +4,7 @@ module Gabb
 		include Mongoid::Timestamps
 
 		has_many :sessions
+		has_many :chats
 
 		field :username, type: String
 		field :given_name, type: String

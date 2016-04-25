@@ -380,3 +380,39 @@ get '/sessions' do
     [401, nil]
   end
 end
+
+get '/chats' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    chats = Gabb::ChatService.chats payload, params
+    if chats && chats.count > 0
+      response_body = Gabb::AppService.convert_objects_to_documents(chats).to_json
+      [200, response_body]
+    else
+      [404, nil]
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
+    [401, nil]
+  end
+end
+
+post '/chat' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-write") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    data = JSON.parse request.body.read
+    chat = Gabb::ChatService.create_chat payload, data
+    headers = { "location" => chat.uri }
+    [201, headers, nil]
+  rescue JSON::ParserError
+    response_body = Hash["message", "Malformed JSON"].to_json
+    [400, nil, response_body]
+  rescue Mongoid::Errors::DocumentNotFound
+    ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
+    [401, response_body]
+  end
+end

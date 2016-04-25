@@ -22,7 +22,7 @@ module Gabb
 		end
 
 		def as_json
-			self.as_document.to_json( :except => ["salt", "hashed_password", "device_token", "facebook_id", "facebook_token"] )
+			self.as_document.to_json
 		end
 
   end
