@@ -14,4 +14,20 @@ FactoryGirl.define do
     facebook_token "abcdef"
   end
 
+  factory :session, class: Gabb::Person do
+    podcast_id 2
+    title "This American Life"
+    episode_url "http://example.podcast.com/episode/2"
+    episode_hash "abcdef"
+    start_time_scale 1000000
+    start_time_value 0
+    stop_time_scale 1000000
+    stop_time_value 351815115
+  end
+
+  factory :chat, class: Gabb::Chat do
+    podcast_id 2
+    text "This is a chat"
+  end
+
 end
