@@ -107,6 +107,14 @@ describe Gabb::SessionService do
       (sessions.select { |a| a.episode_hash == "fortran" }).count.must_equal 1
     end
 
+    it 'must return no more than 25 sessions if no limit is given' do
+      26.times do
+        @person.sessions.create!(Hash(episode_hash: SecureRandom.hex))
+      end
+      sessions = Gabb::SessionService.sessions @payload, Hash.new()
+      sessions.count.must_equal 25
+    end
+
   end
 
 end
