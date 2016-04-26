@@ -14,7 +14,7 @@ FactoryGirl.define do
     facebook_token "abcdef"
   end
 
-  factory :session, class: Gabb::Person do
+  factory :session, class: Gabb::Session do
     podcast_id 2
     title "This American Life"
     episode_url "http://example.podcast.com/episode/2"
