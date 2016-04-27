@@ -87,7 +87,7 @@ describe Gabb::SessionService do
       sleep(0.1)
       @session3 = @person.sessions.create!(Hash(episode_hash: "barfoo"))
       sleep(0.1)
-      @session3 = @person.sessions.create!(Hash(episode_hash: "fortran"))
+      @session4 = @person.sessions.create!(Hash(episode_hash: "fortran"))
     end
 
     it 'must return the most recent session for each episode hash' do

@@ -951,4 +951,132 @@ describe app do
 
   end
 
+	describe 'post sessions/start' do
+
+		before do
+			@hash = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => rand(1000000000))
+			@data = JSON.generate(@hash)
+		end
+
+		it 'must start the session' do
+			post '/session/start', @data, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 201
+			assert_match(/#{ENV['GABB_BASE_URL']}\/session\/id\/\w{24}/, last_response.header["location"])
+			last_response.body.must_equal ""
+			@person1.sessions.last.start_time_value.must_equal @hash["time_value"]
+		end
+
+	end
+
+	describe 'post sessions/stop' do
+
+		before do
+			@hash = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => rand(1000000000))
+			@data = JSON.generate(@hash)
+		end
+
+		it 'must stop the session' do
+			post '/session/stop', @data, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 204
+			assert_match(/#{ENV['GABB_BASE_URL']}\/session\/id\/\w{24}/, last_response.header["location"])
+			last_response.body.must_equal ""
+			@person1.sessions.last.stop_time_value.must_equal @hash["time_value"]
+		end
+
+	end
+
+	describe 'get /session/last' do
+
+		before do
+			@session1 = @person1.sessions.create!(Hash(episode_hash: "foobar"))
+      sleep(0.1)
+      @session2 = @person1.sessions.create!(Hash(episode_hash: "foobar"))
+      sleep(0.1)
+      @session3 = @person1.sessions.create!(Hash(episode_hash: "barfoo"))
+		end
+
+		it 'must get the last session, passing in parameters if available' do
+
+			get '/session/last', nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 200
+			session = JSON.parse(last_response.body)
+			session["episode_hash"].must_equal "barfoo"
+
+			get '/session/last?episode_hash=foobar', nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			session = JSON.parse(last_response.body)
+			session["episode_hash"].must_equal "foobar"
+		end
+
+	end
+
+	describe 'get /sessions' do
+
+		before do
+      @session1 = @person1.sessions.create!(Hash(episode_hash: "foobar"))
+      sleep(0.1)
+      @session2 = @person1.sessions.create!(Hash(episode_hash: "foobar"))
+      sleep(0.1)
+      @session3 = @person1.sessions.create!(Hash(episode_hash: "barfoo"))
+      sleep(0.1)
+      @session4 = @person1.sessions.create!(Hash(episode_hash: "fortran"))
+    end
+
+		it 'must return the last session for each episode hash' do
+			get '/sessions', nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 200
+			sessions = JSON.parse(last_response.body)
+			sessions.count.must_equal 3
+			(sessions.select { |a| a["episode_hash"] == "foobar" }).count.must_equal 1
+			(sessions.select { |a| a["episode_hash"] == "barfoo" }).count.must_equal 1
+			(sessions.select { |a| a["episode_hash"] == "fortran" }).count.must_equal 1
+		end
+
+	end
+
+	describe 'get /chats' do
+
+		before do
+			3.times do
+        @person1.chats.create!(Hash(podcast_id: 2))
+      end
+
+      2.times do
+        @person1.chats.create!(Hash(podcast_id: 3))
+      end
+
+      2.times do
+        @person2.chats.create!(Hash(podcast_id: 2))
+      end
+		end
+
+		it 'must return chats, passing in filter parameters if they are given' do
+			get '/chats', nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 200
+			chats = JSON.parse(last_response.body)
+			chats.count.must_equal Gabb::Chat.count
+
+			get '/chats?podcast_id=2', nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			chats = JSON.parse(last_response.body)
+			chats.count.must_equal Gabb::Chat.where(podcast_id: 2).count
+		end
+
+	end
+
+	describe 'post /chat' do
+
+		before do
+			@hash = Hash("podcast_id" => 2, "text" => "Whoop dee doo")
+			@data = JSON.generate(@hash)
+		end
+
+		it 'must stop the session' do
+			post '/chat', @data, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 201
+			assert_match(/#{ENV['GABB_BASE_URL']}\/chat\/id\/\w{24}/, last_response.header["location"])
+			last_response.body.must_equal ""
+			@person1.chats.last.text.must_equal @hash["text"]
+		end
+
+	end
+
 end
