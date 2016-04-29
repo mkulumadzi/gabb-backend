@@ -15,8 +15,10 @@ module Gabb
 			"#{ENV['GABB_BASE_URL']}/chat/id/#{self.id}"
 		end
 
-    def as_json
-      self.as_document.to_json
+    def default_json
+      doc = self.as_document
+      doc["from_person"] = self.person
+      doc.to_json( except: ["salt", "hashed_password", "device_token", "facebook_id", "facebook_token", "person_id", "email_address_validated"])
     end
 
   end

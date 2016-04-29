@@ -141,9 +141,16 @@ module Gabb
       end
     end
 
-    #To Do: Refactor the app so as not to need this method, or the one above
     def self.json_document_for_people_documents people_documents
       people_documents.to_json( :except => ["salt", "hashed_password", "device_token", "facebook_id", "facebook_token"] )
+    end
+
+    def self.chats_as_json chats
+      json_array = []
+      chats.each do |c|
+        json_array << JSON.parse(c.default_json)
+      end
+      json_array.to_json
     end
 
   end

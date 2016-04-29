@@ -144,7 +144,7 @@ describe Gabb::Person do
 
 	end
 
-	describe 'as json' do
+	describe 'default json' do
 
 		before do
 			@person = build(:person, username: SecureRandom.hex)
@@ -152,35 +152,17 @@ describe Gabb::Person do
 			@person.salt = "def"
 			@person.facebook_id = "123"
 			@person.device_token = "456"
-			@json_document = @person.as_json
+			@json_document = @person.default_json
 			@parsed_document = JSON.parse(@json_document)
 		end
 
-		it 'must return a parseable json document' do
+		it 'must return a parseable json document and include the appropriate fields' do
 			@parsed_document.must_be_instance_of Hash
-		end
-
-		it 'must include the person info' do
 			@parsed_document["username"].must_equal @person.username
-		end
-
-		it 'must not include the salt' do
 			@parsed_document["salt"].must_equal nil
-		end
-
-		it 'must not include the hashed_password' do
 			@parsed_document["hashed_passwords"].must_equal nil
-		end
-
-		it 'must not include the device_token' do
 			@parsed_document["device_token"].must_equal nil
-		end
-
-		it 'must not include the facebook_id' do
 			@parsed_document["facebook_id"].must_equal nil
-		end
-
-		it 'must not include the facebook token' do
 			@parsed_document["facebook_token"].must_equal nil
 		end
 

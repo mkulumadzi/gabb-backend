@@ -79,11 +79,11 @@ get '/person/id/:id' do
   begin
     person = Gabb::Person.find(params[:id])
     if request.env["HTTP_IF_MODIFIED_SINCE"] == nil
-      [200, person.as_json]
+      [200, person.default_json]
     else
       modified_since = Time.parse(env["HTTP_IF_MODIFIED_SINCE"])
       if person.updated_at.to_i > modified_since.to_i
-        [200, person.as_json]
+        [200, person.default_json]
       else
         [304, nil]
       end
@@ -388,7 +388,7 @@ get '/chats' do
   begin
     chats = Gabb::ChatService.chats payload, params
     if chats && chats.count > 0
-      response_body = Gabb::AppService.convert_objects_to_documents(chats).to_json
+      response_body = Gabb::AppService.chats_as_json chats
       [200, response_body]
     else
       [404, nil]

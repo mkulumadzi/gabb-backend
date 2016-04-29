@@ -28,10 +28,24 @@ describe Gabb::Chat do
 
   end
 
-  describe 'as json' do
+  describe 'default json' do
 
-    it 'must return a parseable json document' do
-      JSON.parse(@chat.as_json).must_be_instance_of Hash
+    it 'must return a parseable json document, and must return the appropriate fields' do
+      hash = JSON.parse(@chat.default_json)
+      hash["text"].must_equal @chat.text
+      hash["podcast_id"].must_equal @chat.podcast_id
+      hash["person_id"].must_equal nil
+
+      person = hash["from_person"]
+      person["given_name"].must_equal @person.given_name
+      person["family_name"].must_equal @person.family_name
+
+      person["salt"].must_equal nil
+      person["hashed_password"].must_equal nil
+      person["device_token"].must_equal nil
+      person["facebook_id"].must_equal nil
+      person["facebook_token"].must_equal nil
+      person["email_address_validated"].must_equal nil
     end
 
   end

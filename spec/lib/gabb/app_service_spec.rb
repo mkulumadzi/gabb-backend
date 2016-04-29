@@ -403,4 +403,25 @@ describe Gabb::AppService do
 
   end
 
+  describe 'chats as json' do
+
+    it 'must return a json document with an array of chats' do
+      3.times do
+        @person1.chats.create!(Hash(podcast_id: 2))
+      end
+
+      2.times do
+        @person2.chats.create!(Hash(podcast_id: 3))
+      end
+
+      chats = @person1.chats.to_a + @person2.chats.to_a
+      chat_json = Gabb::AppService.chats_as_json chats
+
+      parsed_document = JSON.parse(chat_json)
+      parsed_document.must_be_instance_of Array
+      parsed_document.count.must_equal 5
+    end
+
+  end
+
 end

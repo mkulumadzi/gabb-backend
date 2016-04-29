@@ -58,7 +58,7 @@ module Gabb
 			"#{ENV['GABB_BASE_URL']}/person/id/#{self.id}"
 		end
 
-		def as_json
+		def default_json
 			self.as_document.to_json( :except => ["salt", "hashed_password", "device_token", "facebook_id", "facebook_token"] )
 		end
 
