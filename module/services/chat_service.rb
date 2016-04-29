@@ -2,7 +2,7 @@ module Gabb
   class ChatService
 
     def self.chats payload, params
-      Gabb::Chat.where(params).order_by(created_at: 'asc').to_a
+      Gabb::Chat.where(params).order_by(created_at: 'desc').to_a
     end
 
     def self.create_chat payload, data
