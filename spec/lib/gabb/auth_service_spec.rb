@@ -280,10 +280,10 @@ describe Gabb::AuthService do
 
 		end
 
-		it 'must send the email without errors' do
-			result = Gabb::AuthService.send_password_reset_email @person
-			result[:error_code].must_equal 0
-		end
+		# it 'must send the email without errors' do
+		# 	result = Gabb::AuthService.send_password_reset_email @person
+		# 	result[:error_code].must_equal 0
+		# end
 
 	end
 
@@ -368,10 +368,10 @@ describe Gabb::AuthService do
 
 		end
 
-		it 'must send the email without errors' do
-			result = Gabb::AuthService.send_email_validation_email_if_necessary @person
-			result[:error_code].must_equal 0
-		end
+		# it 'must send the email without errors' do
+		# 	result = Gabb::AuthService.send_email_validation_email_if_necessary @person
+		# 	result[:error_code].must_equal 0
+		# end
 
 	end
 

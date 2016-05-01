@@ -51,13 +51,9 @@ end
 APNS.host = 'gateway.sandbox.push.apple.com'
 
 if ENV['RACK_ENV'] == 'staging' || ENV['RACK_ENV'] == 'production'
-	# client = Aws::S3::Client.new
-	# certificate_file = client.get_object(bucket:ENV['GABB_CERTIFICATE_BUCKET'], key:'gabb_push_production.pem')
 	APNS.pem  = 'certificates/gabb-push-prod.pem'
 	APNS.host = 'gateway.push.apple.com'
 else
-	# client = Aws::S3::Client.new
-	# certificate_file = client.get_object(bucket:ENV['GABB_CERTIFICATE_BUCKET'], key:'gabb_push_development.pem')
 	APNS.pem  = 'certificates/gabb-push-dev.pem'
 	APNS.host = 'gateway.sandbox.push.apple.com'
 end
