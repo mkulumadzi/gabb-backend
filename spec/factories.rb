@@ -9,7 +9,6 @@ FactoryGirl.define do
     phone "5554443333"
     hashed_password "hash"
     salt "salt"
-    device_token "abc123"
     facebook_id "123"
     facebook_token "abcdef"
   end

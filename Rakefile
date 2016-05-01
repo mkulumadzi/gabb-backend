@@ -74,9 +74,9 @@ namespace :notifications do
   task :test do
     puts "Sending test notification for #{ENV['RACK_ENV']} environment"
     person = Gabb::Person.where(username: "evan.waters@gmail.com").first
-    notifications = [APNS::Notification.new(person.device_token, alert: "Testing Gabb notifications", badge: nil, other: {type: "Test"})]
-    puts "Sending notifications: #{notifications}"
-    APNS.send_notifications(notifications)
+    n = APNS::Notification.new(person.device_token, alert: "Testing Gabb notifications", badge: nil, other: {type: "Test"})
+    puts "Sending notification: #{n}"
+    APNS.send_notifications [n]
   end
 
 end
