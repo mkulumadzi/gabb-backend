@@ -416,3 +416,18 @@ post '/chat' do
     [401, response_body]
   end
 end
+
+# Retrieve a single chat record
+# Scope: can-read
+get '/chat/id/:id' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+
+  begin
+    chat = Gabb::Chat.find(params[:id])
+    [200, chat.default_json]
+  rescue Mongoid::Errors::DocumentNotFound
+    [404, nil]
+  end
+
+end

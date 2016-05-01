@@ -1079,4 +1079,21 @@ describe app do
 
 	end
 
+	describe 'get /chat/id/:id' do
+
+		before do
+			@chat = @person1.chats.create!(Hash(podcast_id: 2))
+		end
+
+		it 'must get the chat' do
+			get "/chat/id/#{@chat.id.to_s}", nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 200
+
+			response = JSON.parse(last_response.body)
+			response["_id"]["$oid"].must_equal @chat.id.to_s
+
+		end
+
+	end
+
 end
