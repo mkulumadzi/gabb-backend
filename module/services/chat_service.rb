@@ -13,7 +13,7 @@ module Gabb
     end
 
     def self.send_chat_notification chat
-      people = Gabb::Person.where(:device_token.ne => nil)
+      people = Gabb::Person.where(:device_token.ne => nil, :id.ne => chat.person.id)
       notifications = []
       people.each do |person|
         notifications << APNS::Notification.new(person.device_token, alert: "#{chat.person.full_name}: #{chat.text}", badge: nil, other: { uri: chat.uri, podcast_id: chat.podcast_id })
