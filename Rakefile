@@ -36,6 +36,15 @@ namespace :db do
     Gabb::Chat.delete_all
   end
 
+  task :seed do
+    Gabb::Person.delete_all
+    Gabb::Token.delete_all
+    Gabb::Session.delete_all
+    Gabb::Chat.delete_all
+
+    Gabb::Person.create!(username: "evan.waters@gmail.com", device_token: "dbeb8d8e3ecb759e38573641b7494731423aa53aa3583ca2ba1920613cf0964f")
+  end
+
 end
 
 namespace :auth do
@@ -56,6 +65,18 @@ namespace :auth do
   task :mark_token_as_valid, [:token] do |t, args|
   	token = Gabb::Token.find_or_create_by(value: args[:token])
   	token.mark_as_valid
+  end
+
+end
+
+namespace :notifications do
+
+  task :test do
+    puts "Sending test notification for #{ENV['RACK_ENV']} environment"
+    person = Gabb::Person.where(username: "evan.waters@gmail.com").first
+    notifications = [APNS::Notification.new(person.device_token, alert: "Testing Gabb notifications", badge: nil, other: {type: "Test"})]
+    puts "Sending notifications: #{notifications}"
+    APNS.send_notifications(notifications)
   end
 
 end

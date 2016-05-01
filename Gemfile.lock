@@ -12,6 +12,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.4.0)
     ansi (1.5.0)
+    apns (1.0.0)
     aws-sdk (2.2.30)
       aws-sdk-resources (= 2.2.30)
     aws-sdk-core (2.2.30)
@@ -119,6 +120,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  apns
   aws-sdk (~> 2)
   bson_ext
   dragonfly

@@ -45,3 +45,21 @@ end
 if Rack::Utils.respond_to?("key_space_limit=")
   Rack::Utils.key_space_limit = 1048576 # 16 times the default size
 end
+
+##Configuring APNS for push notifications
+## 2195 is the default port for Apple
+APNS.host = 'gateway.sandbox.push.apple.com'
+
+if ENV['RACK_ENV'] == 'staging' || ENV['RACK_ENV'] == 'production'
+	# client = Aws::S3::Client.new
+	# certificate_file = client.get_object(bucket:ENV['GABB_CERTIFICATE_BUCKET'], key:'gabb_push_production.pem')
+	APNS.pem  = 'certificates/gabb-push-prod.pem'
+	APNS.host = 'gateway.push.apple.com'
+else
+	# client = Aws::S3::Client.new
+	# certificate_file = client.get_object(bucket:ENV['GABB_CERTIFICATE_BUCKET'], key:'gabb_push_development.pem')
+	APNS.pem  = 'certificates/gabb-push-dev.pem'
+	APNS.host = 'gateway.sandbox.push.apple.com'
+end
+
+APNS.port = 2195
