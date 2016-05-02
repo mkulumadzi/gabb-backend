@@ -52,4 +52,52 @@ describe Gabb::ChatService do
 
   end
 
+  describe 'people to notify for chat' do
+
+    before do
+      @person.device_token = "foo"
+      @person.save
+      @person.chats.create!(Hash(podcast_id: 2))
+
+      @person2.chats.create!(Hash(podcast_id: 2))
+
+      @person3 = create(:person, username: SecureRandom.hex, device_token: "abc")
+      @person3.chats.create!(Hash(podcast_id: 2))
+
+      @person4 = create(:person, username: SecureRandom.hex, device_token: "abc")
+      @person4.chats.create!(Hash(podcast_id: 3))
+    end
+
+    it 'must return a query of people who have sent a chat for that podcast and have a device_token, but not the person who sent this chat' do
+
+      chat = @person.chats.create!(Hash(podcast_id: 2))
+      people = Gabb::ChatService.people_to_notify_for_chat chat
+      people.must_be_instance_of Array
+      people[0].must_be_instance_of Gabb::Person
+
+      (people.select { |person| person.id == @person.id}).count.must_equal 0
+      (people.select { |person| person.id == @person2.id}).count.must_equal 0
+      (people.select { |person| person.id == @person3.id}).count.must_equal 1
+      (people.select { |person| person.id == @person4.id}).count.must_equal 0
+    end
+
+  end
+
+  describe 'send chat notification' do
+
+    it 'must send the notification without an error' do
+      @person.device_token = "foo"
+      @person.save
+      @person.chats.create!(Hash(podcast_id: 2))
+
+      @person2.device_token = "abc"
+      @person2.save
+      chat = @person2.chats.create!(Hash(podcast_id: 2))
+
+      Gabb::ChatService.send_chat_notification(chat).must_equal nil
+
+    end
+
+  end
+
 end

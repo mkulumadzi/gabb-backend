@@ -9,8 +9,6 @@ FactoryGirl.define do
     phone "5554443333"
     hashed_password "hash"
     salt "salt"
-    facebook_id "123"
-    facebook_token "abcdef"
   end
 
   factory :session, class: Gabb::Session do

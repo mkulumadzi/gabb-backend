@@ -12,8 +12,14 @@ module Gabb
       chat
     end
 
+    def self.people_to_notify_for_chat chat
+      people = []
+      Gabb::Chat.where(podcast_id: chat.podcast_id).each { |c| people << c.person }
+      people.uniq.select { |person| person.device_token != nil && person.id != chat.person.id }
+    end
+
     def self.send_chat_notification chat
-      people = Gabb::Person.where(:device_token.ne => nil, :id.ne => chat.person.id)
+      people = Gabb::ChatService.people_to_notify_for_chat chat
       notifications = []
       people.each do |person|
         notifications << APNS::Notification.new(person.device_token, alert: "#{chat.person.full_name}: #{chat.text}", badge: nil, other: { uri: chat.uri, podcast_id: chat.podcast_id })
