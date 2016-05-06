@@ -299,6 +299,24 @@ get '/image/*' do
   redirect Gabb::FileService.get_presigned_url uid
 end
 
+get '/podcasts/listening' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    podcasts = Hash(podcasts: Gabb::PodcastService.listening_to(payload, params))
+    if podcasts && podcasts[:podcasts].count > 0
+      response_body = podcasts.to_json
+      [200, response_body]
+    else
+      [404, nil]
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
+    [401, nil]
+  end
+end
+
 get '/podcasts/*' do
   feedwrangler_url = "https://feedwrangler.net/api/v2"
   client_key = "3475d9da221dca830b1cde44a4079bed"

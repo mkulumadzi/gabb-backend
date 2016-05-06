@@ -5,6 +5,8 @@ describe Gabb::Session do
   before do
     @person = create(:person, username: SecureRandom.hex)
     @session = @person.sessions.new(attributes_for(:session))
+    @podcast = Hash(podcast_id: 2, image_url: "http://example.com/image.jpg", title: "Awesome podcast", feed_url: "http://example.com/feed")
+    @session.podcast = @podcast
   end
 
   describe 'create a session' do
@@ -14,7 +16,7 @@ describe Gabb::Session do
     end
 
     it 'must store the fields' do
-      @session.podcast_id.must_equal attributes_for(:session)[:podcast_id]
+      @session.podcast.must_equal @podcast
       @session.title.must_equal attributes_for(:session)[:title]
       @session.episode_url.must_equal attributes_for(:session)[:episode_url]
       @session.episode_hash.must_equal attributes_for(:session)[:episode_hash]
@@ -25,6 +27,21 @@ describe Gabb::Session do
     end
 
   end
+
+  # describe 'embed podcast info' do
+  #
+  #   it 'must embed podcast info' do
+  #     @session.podcast_info = build(:podcast_info)
+  #     @session.podcast_info.must_be_instance_of Gabb::PodcastInfo
+  #
+  #     attrs = attributes_for(:podcast_info)
+  #     @session.podcast_info[:podcast_id].must_equal attrs[:podcast_id]
+  #     @session.podcast_info[:image_url].must_equal attrs[:image_url]
+  #     @session.podcast_info[:feed_url].must_equal attrs[:feed_url]
+  #     @session.podcast_info[:title].must_equal attrs[:title]
+  #   end
+  #
+  # end
 
   describe 'uri' do
 

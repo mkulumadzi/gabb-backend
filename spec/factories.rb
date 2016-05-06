@@ -12,7 +12,6 @@ FactoryGirl.define do
   end
 
   factory :session, class: Gabb::Session do
-    podcast_id 2
     title "This American Life"
     episode_url "http://example.podcast.com/episode/2"
     episode_hash "abcdef"

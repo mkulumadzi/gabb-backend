@@ -951,6 +951,36 @@ describe app do
 
   end
 
+	describe 'get podcasts/listening' do
+
+		before do
+
+	    @podcast1 = Hash("podcast_id" => 1, "title" => "Awesome podcast", "image_url" => "http://example.com/image.jpg", "feed_url" => "http://example.com/podcast/feed")
+	    @podcast2 = Hash("podcast_id" => 2, "title" => "Awesome podcast", "image_url" => "http://example.com/image.jpg", "feed_url" => "http://example.com/podcast/feed")
+
+	    @session1 = @person1.sessions.create!(Hash(episode_hash: "foobar", podcast: @podcast1))
+
+	    sleep(0.1)
+	    @session2 = @person1.sessions.create!(Hash(episode_hash: "foobar", podcast: @podcast1))
+
+	    sleep(0.1)
+	    @session3 = @person1.sessions.create!(Hash(episode_hash: "barfoo", podcast: @podcast1))
+
+	    sleep(0.1)
+	    @session4 = @person1.sessions.create!(Hash(episode_hash: "fortran", podcast: @podcast2))
+	  end
+
+		it 'must return the podcasts the person has been listening to' do
+			get '/podcasts/listening', nil, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 200
+			podcasts = JSON.parse(last_response.body)["podcasts"]
+			podcasts.count.must_equal 2
+			podcasts[0].must_equal @podcast2
+			podcasts[1].must_equal @podcast1
+		end
+
+	end
+
 	describe 'post sessions/start' do
 
 		before do

@@ -10,9 +10,12 @@ describe Gabb::SessionService do
   describe 'start session' do
 
     it 'must create a new session if the data and payload is valid and save it to the database' do
-      data = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 515135135)
+      podcast_hash = Hash("podcast_id" => 2, "title" => "Awesome podcast", "image_url" => "http://example.com/image.jpg", "feed_url" => "http://example.com/podcast/feed")
+      data = Hash("podcast" => podcast_hash, "title" => "Talkin bout Gabb", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 515135135)
       session = Gabb::SessionService.start_session @payload, data
-      session.podcast_id.must_equal data["podcast_id"]
+
+      session.podcast.must_equal podcast_hash
+
       session.title.must_equal data["title"]
       session.episode_url.must_equal data["episode_url"]
       session.episode_hash.must_equal data["episode_hash"]
@@ -25,14 +28,18 @@ describe Gabb::SessionService do
 
   describe 'stop session' do
 
+    before do
+      @podcast_hash = Hash("podcast_id" => 2, "title" => "Awesome podcast", "image_url" => "http://example.com/image.jpg", "feed_url" => "http://example.com/podcast/feed")
+    end
+
     it 'must update an existing session if it exists' do
 
-      start_data = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 515135135)
+      start_data = Hash("podcast" => @podcast_hash, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 515135135)
       start_session = Gabb::SessionService.start_session @payload, start_data
 
       session_count = @person.sessions.count
 
-      stop_data = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 987135135)
+      stop_data = Hash("podcast" => @podcast_hash, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 987135135)
       stop_session = Gabb::SessionService.stop_session @payload, stop_data
 
       session_count.must_equal @person.sessions.count
@@ -43,12 +50,14 @@ describe Gabb::SessionService do
     end
 
     it 'must create a new session if it does not exist for that episode hash' do
-      start_data = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "defghadfa", "time_scale" => 1000000, "time_value" => 515135135)
+      start_data = Hash("podcast" => @podcast_hash, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "defghadfa", "time_scale" => 1000000, "time_value" => 515135135)
       start_session = Gabb::SessionService.start_session @payload, start_data
 
       session_count = @person.sessions.count
 
-      stop_data = Hash("podcast_id" => 3, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 987135135)
+      another = Hash("podcast_id" => 3, "title" => "Awesome podcast", "image_url" => "http://example.com/image.jpg", "feed_url" => "http://example.com/podcast/feed")
+
+      stop_data = Hash("podcast" => another, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 987135135)
       stop_session = Gabb::SessionService.stop_session @payload, stop_data
 
       @person.sessions.count.must_equal session_count + 1

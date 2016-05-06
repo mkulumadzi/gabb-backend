@@ -3,7 +3,7 @@ module Gabb
 
     def self.start_session payload, data
       person = Gabb::Person.find(payload["id"])
-      hash = Hash(podcast_id: data["podcast_id"], title: data["title"], episode_url: data["episode_url"], episode_hash: data["episode_hash"], start_time_scale: data["time_scale"], start_time_value: data["time_value"])
+      hash = Hash(podcast: data["podcast"], title: data["title"], episode_url: data["episode_url"], episode_hash: data["episode_hash"], start_time_scale: data["time_scale"], start_time_value: data["time_value"])
       person.sessions.create! hash
     end
 
@@ -15,7 +15,7 @@ module Gabb
         hash = Hash(stop_time_scale: data["time_scale"], stop_time_value: data["time_value"])
         session.update_attributes hash
       else
-        hash = Hash(podcast_id: data["podcast_id"], title: data["title"], episode_url: data["episode_url"], episode_hash: data["episode_hash"], stop_time_scale: data["time_scale"], stop_time_value: data["time_value"])
+        hash = Hash(podcast: data["podcast"], title: data["title"], episode_url: data["episode_url"], episode_hash: data["episode_hash"], stop_time_scale: data["time_scale"], stop_time_value: data["time_value"])
         session = person.sessions.create! hash
       end
 
