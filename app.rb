@@ -422,7 +422,7 @@ get 'chats/podcasts' do
   if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
   payload = Gabb::AppService.get_payload_from_authorization_header request
   begin
-    podcasts = Hash(podcasts: Gabb::PodcastService.listening_to(payload, params))
+    podcasts = Hash(podcasts: Gabb::PodcastService.podcasts_with_chats(payload, params))
     if podcasts && podcasts[:podcasts].count > 0
       response_body = podcasts.to_json
       [200, response_body]
