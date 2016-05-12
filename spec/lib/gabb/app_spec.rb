@@ -994,6 +994,7 @@ describe app do
 			assert_match(/#{ENV['GABB_BASE_URL']}\/session\/id\/\w{24}/, last_response.header["location"])
 			last_response.body.must_equal ""
 			@person1.sessions.last.start_time_value.must_equal @hash["time_value"]
+			binding.pry
 		end
 
 	end

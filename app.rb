@@ -417,6 +417,23 @@ get '/chats' do
   end
 end
 
+get 'chats/podcasts' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    podcasts = Hash(podcasts: Gabb::PodcastService.listening_to(payload, params))
+    if podcasts && podcasts[:podcasts].count > 0
+      response_body = podcasts.to_json
+      [200, response_body]
+    else
+      [404, nil]
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    [401, nil]
+  end
+end
+
 post '/chat' do
   content_type :json
   if Gabb::AppService.unauthorized?(request, "can-write") then return [401, nil] end

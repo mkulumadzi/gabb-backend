@@ -18,6 +18,7 @@ gem 'dragonfly-s3_data_store'
 gem 'postmark'
 gem 'mime-types'
 gem 'apns'
+gem 'httparty'
 
 group :test do
   gem 'turn'
