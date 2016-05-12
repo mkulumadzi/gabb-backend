@@ -417,7 +417,7 @@ get '/chats' do
   end
 end
 
-get 'chats/podcasts' do
+get '/chats/podcasts' do
   content_type :json
   if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
   payload = Gabb::AppService.get_payload_from_authorization_header request
