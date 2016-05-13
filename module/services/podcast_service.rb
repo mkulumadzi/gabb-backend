@@ -18,11 +18,19 @@ module Gabb
       podcasts
     end
 
+    def self.get_detailed_podcast_info podcast_id
+      podcast = Gabb::PodcastService.get_podcast podcast_id
+    end
+
     def self.get_basic_podcast_info podcast_id
+      podcast = Gabb::PodcastService.get_podcast podcast_id
+      Hash("title" => podcast["title"], "podcast_id" => podcast["podcast_id"], "feed_url" => podcast["feed_url"], "image_url" => podcast["image_url"] )
+    end
+
+    def self.get_podcast podcast_id
       client_key = "3475d9da221dca830b1cde44a4079bed"
       podcast_url = "https://feedwrangler.net/api/v2/podcasts/show?podcast_id=#{podcast_id}&client_key=#{client_key}"
       podcast = JSON.parse(HTTParty.get(podcast_url).body)["podcast"]
-      Hash("title" => podcast["title"], "podcast_id" => podcast["podcast_id"], "feed_url" => podcast["feed_url"], "image_url" => podcast["image_url"] )
     end
 
     def self.podcasts_with_chats payload, params

@@ -317,6 +317,23 @@ get '/podcasts/listening' do
   end
 end
 
+get '/podcast/id/:id' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    podcast = Gabb::PodcastService.get_detailed_podcast_info params[:id]
+    if podcast
+      [200, podcast.to_json]
+    else
+      [404, nil]
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
+    [401, nil]
+  end
+end
+
 get '/podcasts/*' do
   feedwrangler_url = "https://feedwrangler.net/api/v2"
   client_key = "3475d9da221dca830b1cde44a4079bed"

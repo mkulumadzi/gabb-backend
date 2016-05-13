@@ -18,6 +18,7 @@ module Gabb
 
     index({ episode_hash: 1})
     index({ podcast_info: 1})
+    index({ episode_url: 1})
 
     def uri
 			"#{ENV['GABB_BASE_URL']}/session/id/#{self.id}"
