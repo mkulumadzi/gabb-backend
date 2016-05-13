@@ -18,8 +18,22 @@ module Gabb
       podcasts
     end
 
-    def self.get_detailed_podcast_info podcast_id
-      podcast = Gabb::PodcastService.get_podcast podcast_id
+    def self.get_detailed_podcast_info payload, params
+      person = Gabb::Person.find(payload["id"])
+      podcast = Gabb::PodcastService.get_podcast params["id"]
+      podcast["recent_episodes"] = Gabb::PodcastService.add_session_info_to_podcast_episodes podcast["recent_episodes"], person
+      podcast
+    end
+
+    def self.add_session_info_to_podcast_episodes episodes, person
+      episodes.each do |e|
+        session = person.sessions.where(episode_url: e["audio_url"]).order_by(created_at: 'desc').first
+        if session
+          session_hash = Hash("start_time_value" => session[:start_time_value], "start_time_scale" => session[:start_time_scale], "stop_time_value" => session[:stop_time_scale], "stop_time_scale" => session[:stop_time_value])
+          e["last_session"] = session_hash
+        end
+      end
+      episodes
     end
 
     def self.get_basic_podcast_info podcast_id

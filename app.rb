@@ -322,7 +322,7 @@ get '/podcast/id/:id' do
   if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end
   payload = Gabb::AppService.get_payload_from_authorization_header request
   begin
-    podcast = Gabb::PodcastService.get_detailed_podcast_info params[:id]
+    podcast = Gabb::PodcastService.get_detailed_podcast_info payload, params
     if podcast
       [200, podcast.to_json]
     else
