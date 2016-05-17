@@ -65,6 +65,28 @@ describe Gabb::SessionService do
 
   end
 
+  describe 'finish session' do
+
+    before do
+      @podcast_hash = Hash("podcast_id" => 2, "title" => "Awesome podcast", "image_url" => "http://example.com/image.jpg", "feed_url" => "http://example.com/podcast/feed")
+    end
+
+    it 'must stop a session and mark it as finished' do
+
+      start_data = Hash("podcast" => @podcast_hash, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 515135135)
+      start_session = Gabb::SessionService.start_session @payload, start_data
+
+
+      stop_data = Hash("podcast" => @podcast_hash, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => 987135135)
+      stop_session = Gabb::SessionService.finish_session @payload, stop_data
+
+      stop_session.stop_time_scale.must_equal stop_data["time_scale"]
+      stop_session.stop_time_value.must_equal stop_data["time_value"]
+      stop_session.finished.must_equal true
+    end
+
+  end
+
   describe 'last session' do
 
     before do

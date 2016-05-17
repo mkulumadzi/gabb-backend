@@ -15,6 +15,7 @@ module Gabb
     field :start_time_value, type: Integer
     field :stop_time_scale, type: Integer
     field :stop_time_value, type: Integer
+    field :finished, type: Boolean, default: false
 
     index({ episode_hash: 1})
     index({ podcast_info: 1})

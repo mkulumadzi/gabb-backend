@@ -24,6 +24,7 @@ describe Gabb::Session do
       @session.start_time_value.must_equal attributes_for(:session)[:start_time_value]
       @session.stop_time_scale.must_equal attributes_for(:session)[:stop_time_scale]
       @session.stop_time_value.must_equal attributes_for(:session)[:stop_time_value]
+      @session.finished.must_equal false
     end
 
   end

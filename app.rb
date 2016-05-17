@@ -385,6 +385,24 @@ post '/session/stop' do
   end
 end
 
+post '/session/finish' do
+  content_type :json
+  if Gabb::AppService.unauthorized?(request, "can-write") then return [401, nil] end
+  payload = Gabb::AppService.get_payload_from_authorization_header request
+  begin
+    data = JSON.parse request.body.read
+    session = Gabb::SessionService.finish_session payload, data
+    headers = { "location" => session.uri }
+    [204, headers, nil]
+  rescue JSON::ParserError
+    response_body = Hash["message", "Malformed JSON"].to_json
+    [400, nil, response_body]
+  rescue Mongoid::Errors::DocumentNotFound
+    ## A document not found error should be the result of the person not existing due to an invalid ID (potentially coming in from a different server)
+    [401, nil]
+  end
+end
+
 get '/session/last' do
   content_type :json
   if Gabb::AppService.unauthorized?(request, "can-read") then return [401, nil] end

@@ -22,6 +22,13 @@ module Gabb
       session
     end
 
+    def self.finish_session payload, data
+      session = Gabb::SessionService.stop_session payload, data
+      session.finished = true
+      session.save
+      session
+    end
+
     def self.last_session payload, params
       person = Gabb::Person.find(payload["id"])
 

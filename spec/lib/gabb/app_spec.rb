@@ -994,7 +994,6 @@ describe app do
 			assert_match(/#{ENV['GABB_BASE_URL']}\/session\/id\/\w{24}/, last_response.header["location"])
 			last_response.body.must_equal ""
 			@person1.sessions.last.start_time_value.must_equal @hash["time_value"]
-			binding.pry
 		end
 
 	end
@@ -1012,6 +1011,24 @@ describe app do
 			assert_match(/#{ENV['GABB_BASE_URL']}\/session\/id\/\w{24}/, last_response.header["location"])
 			last_response.body.must_equal ""
 			@person1.sessions.last.stop_time_value.must_equal @hash["time_value"]
+		end
+
+	end
+
+	describe 'post sessions/finish' do
+
+		before do
+			@hash = Hash("podcast_id" => 2, "title" => "A podcast", "episode_url" => "http://apodcast.com/podcast", "episode_hash" => "asdfafda", "time_scale" => 1000000, "time_value" => rand(1000000000))
+			@data = JSON.generate(@hash)
+		end
+
+		it 'must finish the session' do
+			post '/session/finish', @data, {"HTTP_AUTHORIZATION" => "Bearer #{@person1_token}"}
+			last_response.status.must_equal 204
+			assert_match(/#{ENV['GABB_BASE_URL']}\/session\/id\/\w{24}/, last_response.header["location"])
+			last_response.body.must_equal ""
+			@person1.sessions.last.stop_time_value.must_equal @hash["time_value"]
+			@person1.sessions.last.finished.must_equal true
 		end
 
 	end
