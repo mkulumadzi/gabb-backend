@@ -29,7 +29,7 @@ module Gabb
       episodes.each do |e|
         session = person.sessions.where(episode_url: e["audio_url"]).order_by(created_at: 'desc').first
         if session
-          session_hash = Hash("start_time_value" => session[:start_time_value], "start_time_scale" => session[:start_time_scale], "stop_time_value" => session[:stop_time_scale], "stop_time_scale" => session[:stop_time_value])
+          session_hash = Hash("start_time_value" => session[:start_time_value], "start_time_scale" => session[:start_time_scale], "stop_time_value" => session[:stop_time_scale], "stop_time_scale" => session[:stop_time_value], "finished" => session[:finished])
           e["last_session"] = session_hash
         end
       end
